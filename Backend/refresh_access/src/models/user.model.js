@@ -7,11 +7,16 @@ const userSchema = new mongoose.Schema({
     },
     email : {
         type : String,
-        required : true
+        required : true,
+        unique : true,
+        match : /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
     },
     passwordHash : {
         type : String,
         required : true
+    },
+    refreshToken : {
+        type : String
     }
 })
 
