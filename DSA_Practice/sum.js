@@ -2,20 +2,27 @@
 
 // let t = prompt("Enter a String: ");
 
+let mat = [
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9]
+];
 
-let s = "yo|uar|e**|b|e***au|tifu|l"
-let count = 0
-let inside = false
+let sum = 0;
 
-for (let i = 0; i < s.length; i++) {
-    if (s[i] === "|") {
-      inside = !inside;
-    } else if (s[i] === "*" && !inside) {
-      count++;
+for (let i = 0; i < mat.length; i++) {
+  for (let j = 0; j < mat[i].length; j++) {
+
+    if (
+      i === j ||
+      i + j === mat[i].length - 1
+    ) {
+      sum += mat[i][j];
     }
+
   }
+}
 
+console.log(sum);
 
-console.log("count",count)
-console.log("inside",inside = !inside)
 
