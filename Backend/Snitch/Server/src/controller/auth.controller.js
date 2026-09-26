@@ -23,7 +23,7 @@ export const register = async (req,res) => {
             message : "User already exist with this email address ",
             errors : [
                 {
-                    field : "email",
+                    path : "email",
                     message : 'User already exists with this email'
                 }
             ]
@@ -41,8 +41,29 @@ export const register = async (req,res) => {
         role : user.role
     })
 
-    const refreshTokenToken = createRefreshToken({
+    const refreshToken = createRefreshToken({
         userId : user._id,
         role : user.role
+    })
+
+    res.cookie("refreshToken",refreshToken,{
+        httpOnly : true
+    })
+
+    await userModel.findByIdAndUpdate(user._id,{
+        refreshToken
+    })
+
+    res.status(201).json({
+        message : "User register successfully",
+        data : {
+            user : {
+                email : user.email,
+                name : user.name,
+                id : user._id
+            },
+            accessToken
+        }
+        
     })
 }
