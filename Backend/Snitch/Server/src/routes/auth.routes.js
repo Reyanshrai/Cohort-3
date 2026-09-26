@@ -1,5 +1,5 @@
 import {Router} from "express"
-import {registerValidator} from "../validators/auth.validator.js"
+import {registerValidator,loginValidator} from "../validators/auth.validator.js"
 import {register} from "../controller/auth.controller.js"
 
 const router = Router()
@@ -12,5 +12,14 @@ const router = Router()
  */
 
 router.post('/register',registerValidator,register)
+
+/**
+ * @POST /api/auth/login
+ * @param req Express req
+ * @param req.body = {email,password} 
+ * @response res.status = 200 (if successfull)
+ */
+
+router.post('/login',loginValidator)
 
 export default router
