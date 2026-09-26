@@ -67,3 +67,13 @@ export const register = async (req,res) => {
         
     })
 }
+
+/**
+ * @param req express.Request
+ * @param req.body Object
+ * @param req.body.email String
+ * @param req.body.password String
+ * res.status(200)
+ */
+
+    
