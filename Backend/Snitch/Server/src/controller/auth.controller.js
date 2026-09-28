@@ -195,7 +195,7 @@ export const refresh = async (req,res) =>{
     }
 }
 
-export async function getMe (req,res){
+export const getMe = async (req,res) =>{
 
     const {userId,role} = req.user
 
