@@ -1,6 +1,7 @@
 import userModel from "../models/user.model.js";
 import bcrypt from "bcryptjs"
-import {createAccessToken,createRefreshToken} from "../utils/auth.utils.js"
+import {createAccessToken,createRefreshToken,readRefreshToken} from "../utils/auth.utils.js"
+
 
 /**
  * @description Register an user and save the data from req.body
@@ -69,11 +70,146 @@ export const register = async (req,res) => {
 }
 
 /**
- * @param req express.Request
- * @param req.body Object
+ * @description login a user and create new set of access token and refrsesh token
  * @param req.body.email String
  * @param req.body.password String
  * res.status(200)
  */
 
-    
+export const login = async (req,res) =>{
+    const {email,password} = req.body
+
+    const user = await userModel.findOne({
+        email
+    })
+
+    if(!user){
+        return res.status(400).json({
+            message : "Invaild email or password",
+
+        })
+    }
+
+    const isPasswordValid = await bcrypt.compare(password,user.passwordHash)
+
+    if(!isPasswordValid){
+        return res.status(400).json({
+            message : "Invalid email or password"
+        })
+    }
+
+    const accessToken = createAccessToken({
+        userId : user._id,
+        role : user.role
+    })
+
+    const refreshToken = createRefreshToken({
+        userId : user._id,
+        role : user.role
+    })
+
+    await userModel.findOneAndUpdate({
+        email
+    },
+        {
+            refreshToken
+    })
+
+    res.cookie("refreshToken" , refreshToken,{
+        httpOnly : true
+    })
+
+    res.status(200).json({
+        message : "user loggesIn successfully",
+        data : {
+            user : {
+                id : user._id,
+                email : user.email,
+                name : user.name
+            },
+            accessToken
+        }
+    })
+}
+
+export const refresh = async (req,res) =>{
+
+    const refreshToken = req.cookies.refreshToken
+
+    if(!refreshToken){
+        return res.status(401).json({
+            message : "refresh Token is required"
+        })
+    }
+
+    try {
+        
+        const decoded = readRefreshToken(refreshToken)
+
+        const {userId,role} = decoded
+
+        const user = await userModel.findById(userId)
+
+        if(refreshToken !== user.refreshToken){
+            await userModel.findByIdAndUpdate(user._id,{
+                refreshToken : null,
+            })
+
+            return res.status(401).json({
+                message : "Refresh token mismatch"
+            })
+        }
+
+        const accessToken = createAccessToken({
+            userId,role
+        })
+
+        const newRefreshToken = createRefreshToken({
+            userId,role
+        })
+
+        await userModel.findByIdAndUpdate(user._id,{
+            refreshToken : newRefreshToken
+        })
+
+        res.cookie("refreshToken",newRefreshToken,{
+            httpOnly : true
+        })
+
+        res.status(200).json({
+            message : "Token rotated successfully",
+            data : {
+                user : {
+                    email : user.email,
+                    name : user.name,
+                    id : user._id
+                },
+                accessToken
+            }
+        })
+
+    } catch (error) {
+        return res.status(401).json({
+            message : "invalid refresh Token"
+        })
+    }
+}
+
+export async function getMe (req,res){
+
+    const {userId,role} = req.user
+
+    const user = await userModel.findById(userId)
+
+    res.status(200).json({
+        message : "User fetched successfully",
+        data : {
+            user : {
+                name : user.name,
+                email : user.email,
+                id : user._id
+            }
+        }
+    })
+
+}
