@@ -1,16 +1,9 @@
 import {Router} from "express"
-import multer from 'multer'
 import {createProductValidator} from "../validators/product.validator.js"
 import {authenticate} from '../middlewares/auth.middleware.js'
 import {createProduct} from "../controller/product.controller.js"
+import upload from "../config/multer.config.js"
 
-const upload = multer({
-    storage: multer.memoryStorage,
-    limits : {
-        files : 5,
-        fileSize : 1 * 1024 * 1024 // 1MB
-    }
-})
 
 const router = Router()
 
