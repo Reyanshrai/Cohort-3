@@ -1,7 +1,7 @@
 import {Router} from "express"
 import {createProductValidator} from "../validators/product.validator.js"
 import {authenticate} from '../middlewares/auth.middleware.js'
-import {createProduct} from "../controller/product.controller.js"
+import {createProduct,listAllProducts} from "../controller/product.controller.js"
 import upload from "../config/multer.config.js"
 
 
@@ -13,7 +13,7 @@ const router = Router()
  * @description creates product and save it data  into db images wil be store in imagekit
  * @access seller
  * req.body => {title , description , price:{amount , currency},sizes,:size , stock}
- */
+*/
 
 router.post('/',authenticate,
     
@@ -38,5 +38,14 @@ router.post('/',authenticate,
 
     next()
 },createProductValidator,createProduct)
+
+/**
+ * @method GET
+ * @route /api/product
+ * @description Read all the products from the DB
+ * @access Only authenticate user
+*/
+
+router.get('/',authenticate,listAllProducts)
 
 export default router
