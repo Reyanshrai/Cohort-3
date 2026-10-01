@@ -27,3 +27,12 @@ export async function authenticate(req,res,next){
         })
     }
 }
+
+export function authenticateSeller(req,res,next){
+    if(req.user.role !== 'seller'){
+        return res.status(403).json({
+            message : "Unauthorized Access only can seller access this"
+        })
+    }
+    next()
+} 
