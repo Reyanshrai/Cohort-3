@@ -3,21 +3,20 @@ import { uploadFile } from "../services/storage.service.js";
 
 export const createProduct = async (req,res)=>{
 
-    const {title,description,sizes,price,} = req.body
+    const {title,description} = req.body
 
-    const filesUrl = []
+    const responses = await Promise.all(
+        req.files.map((file)=>
+        uploadFile({
+            buffer : file.buffer,
+            fileName : file.originalname
+        }))
+    )
 
-    for(let i = 0; i<req.files.length ; i++){
+    const filesUrl = responses.map((response) => response.url)
 
-        const response = await uploadFile({
-            buffer : req.files[i].buffer,
-            fileName : req.files[i].originalname
-        })
-
-        filesUrl.push(response.url)
-    }
-
-    console.log("FilesUrl",filesUrl);
+    console.log("filesUrl",filesUrl);
+    
 
     const product = await productModel.create({
         title,
@@ -45,7 +44,7 @@ export const createProduct = async (req,res)=>{
 
 export const listAllProducts = async(req,res) =>{
 
-    const product = await productModel.find()
+    const product = await productModel.find({ published : true })
 
     res.status(200).json({
         message : "Product fetched successfully",
@@ -54,4 +53,67 @@ export const listAllProducts = async(req,res) =>{
         }
     })
 
+}
+
+export const listAllProductsToSeller = async (req,res) => {
+
+    const product = await productModel.find()
+
+    return res.status(200).json({
+        message : "All products fetched successfully",
+        data : {
+            product
+        }
+
+    })
+}
+
+export const unlistProduct = async (req,res)=>{
+
+    const {id} = req.params
+
+    const product = await productModel.findById(id)
+
+    if(!product){
+        return res.status(400).json({
+            message : "Product not found by id",
+        })
+    }
+
+    // make product unpublished
+
+    await productModel.findByIdAndUpdate(id,
+        {
+            published : false
+        }
+    )
+
+    return res.status(200).json({
+        message : "Product unpublished successfully"
+    })
+}
+
+export const listProduct = async (req,res)=>{
+
+    const {id} = req.params
+
+    const product = await productModel.findById(id)
+
+    if(!product){
+        return res.status(400).json({
+            message : "Product not found by id",
+        })
+    }
+
+    // make product published
+
+    await productModel.findByIdAndUpdate(id,
+        {
+            published : true
+        }
+    )
+
+    return res.status(200).json({
+        message : "Product published successfully"
+    })
 }
