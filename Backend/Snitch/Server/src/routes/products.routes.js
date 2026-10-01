@@ -1,7 +1,7 @@
 import {Router} from "express"
-import {createProductValidator} from "../validators/product.validator.js"
-import {authenticate} from '../middlewares/auth.middleware.js'
-import {createProduct,listAllProducts} from "../controller/product.controller.js"
+import {createProductValidator,unlistProductValidator,listProductValidator} from "../validators/product.validator.js"
+import {authenticate,authenticateSeller} from '../middlewares/auth.middleware.js'
+import {createProduct,listAllProducts,unlistProduct,listProduct,listAllProductsToSeller} from "../controller/product.controller.js"
 import upload from "../config/multer.config.js"
 
 
@@ -15,19 +15,7 @@ const router = Router()
  * req.body => {title , description , price:{amount , currency},sizes,:size , stock}
 */
 
-router.post('/',authenticate,
-    
-    // check role is seller or not
-    (req,res,next)=>{
-    if(req.user.role !== "seller"){
-        return res.status(403).json({
-            message : "User is not authorized to create product"
-        })
-    }
-    next()
-
-    // required for reading data from req.body  if the formate is form-data(multipart form data )
-},upload.array("images"),
+router.post('/',authenticate,authenticateSeller,upload.array("images"),
 
     // parse the complex data like object and array into json
 
@@ -42,10 +30,37 @@ router.post('/',authenticate,
 /**
  * @method GET
  * @route /api/product
- * @description Read all the products from the DB
+ * @description Read all the published products from the DB
  * @access Only authenticate user
 */
 
 router.get('/',authenticate,listAllProducts)
+
+/**
+ * @method GET
+ * @route /api/product/seller 
+ * @description read all the products from the db
+ * @access seller
+*/
+
+router.get('/seller',authenticate,authenticateSeller,listAllProductsToSeller)
+
+/**
+ * @method PATCH
+ * @route /api/products/unlist/:id
+ * @description unlist a product by its id
+ * @access seller
+*/
+
+router.patch('/unlist/:id',authenticate,authenticateSeller,unlistProductValidator,unlistProduct)
+
+/**
+ * @method PATCH
+ * @route /api/products/unlist/:id
+ * @description unlist a product by its id
+ * @access seller
+*/
+
+router.patch('/unlist/:id',authenticate,authenticateSeller,listProductValidator,listProduct)
 
 export default router
