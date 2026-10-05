@@ -36,22 +36,40 @@
 // console.log(set);
 
 
-let jewels = 'aA'
-let stone = 'aAAbbb'
+// let jewels = 'aA'
+// let stone = 'aAAbbb'
 
-let set = new Set(stone)
-let set1 = new Set(jewels)
-console.log(set1);
+// let set = new Set(stone)
+// let set1 = new Set(jewels)
+// console.log(set1);
 
-let count = 0
+// let count = 0
 
-for(let i = 0; i<stone.length;i++){
-  if(set.has(i) == set1.has(i)) count++
-}
+// for(let i = 0; i<stone.length;i++){
+//   if(set.has(i) == set1.has(i)) count++
+// }
 
-console.log("count",count);
+// console.log("count",count);
+
+let name = ['aa','bb','cc','dd']
+let arr = [2,7,11,15]
+
+let map = new Map()
+let result = []
 
 
+// function checkTargetEqual(nums,target){
+
+//   for(let i = 0; i <nums.length;i++){
+//     for(let j = i+1; j<nums.length;j++){
+//       if(arr[i] + arr[j] == target){
+//         return [nums[i],nums[j]]
+//       }
+//     }
+//   }
+// } 
+
+// checkTargetEqual([2,7,11,15],9);
 
 
 
