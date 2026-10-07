@@ -1,6 +1,6 @@
 import {body,validationResult} from 'express-validator'
 
-export const registerValidators = [
+export const registerValidator = [
     body('name')
         .exists().withMessage("Name must be required").bail()
         .isString().withMessage('Name must be string').bail()
@@ -41,7 +41,7 @@ export const registerValidators = [
 
 ]
 
-export const loginValidators = [
+export const loginValidator = [
 
     body('email')
         .exists().withMessage("Email is required").bail()   
