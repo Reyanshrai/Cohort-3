@@ -1,6 +1,6 @@
 import {Router} from 'express'
-import {registerValidators} from "../validator/auth.validator.js"
-import {register} from "../controller/auth.controller.js"
+import {registerValidator,loginValidator} from "../validator/auth.validator.js"
+import {register,login,refreshToken} from "../controller/auth.controller.js"
 
 const router = Router()
 
@@ -11,7 +11,7 @@ const router = Router()
  * @response res.status = 201 (if successfull) 
 */
 
-router.post('/register',registerValidators,register)
+router.post('/register',registerValidator,register)
 
 /**
  * @POST /api/auth/login
@@ -20,6 +20,14 @@ router.post('/register',registerValidators,register)
  * @response res.status = 200 (if successfull) 
 */
 
-router.post('/login',)
+router.post('/login',loginValidator,login)
+
+/**
+ * @POST /api/auth/refresh-token
+ * @param req Express req
+ * @response res.status = 200 (if successfull) 
+*/
+
+router.post("/refresh-token",refreshToken)
 
 export default router
