@@ -12,7 +12,7 @@ import {createAccessToken,createRefreshToken,readRefreshToken} from "../utils/au
  * @param req.body.password String
  */
 
-export const register = async (req,res) => {
+export const register = async (req,res) => {    
     const {email,name,password} = req.body
 
     const isUserAlreadyExists = await userModel.findOne({
