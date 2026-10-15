@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.20.0/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Razorpay Payment Gateway</h1>
+    <button id="payButton">Pay Now</button>
+
+    <script>
+
+        async function payNow(){
+
+            const response = await axios.post('http://localhost:3000/api/payments/6ad08edc628bec2f2ee0a63d/order')
+            const {data} = response;
+
+            const rzp = new window.Razorpay({
+                keyId : data.keyId,
+                order_id : data.orderId,
+                amount : data.amount * 100,
+                currency : data.currency,
+                name : 'kapda co.',
+                description : 'Test Transaction',
+
+                handler : async function(response){
+                   
+                    const verify = await axios.post("http://localhost:3000/api/payments/verify",{
+                        orderId : response.order_id,
+                        paymentId : response.razorpay_payment_id,
+                        signature : response.razorpay_signature
+                    })
+
+                    if(verify.data.status === "success")showOrderConfirmed()
+                    else showPaymentFailed()
+
+                    console.log("Resonse from Razorpay:", response);
+                }
+            });
+
+            rzp.open();
+        }
+
+        document.getElementById("payButton").addEventListener("click", payNow);
+
+    </script>
+
+</body>
+</html>
