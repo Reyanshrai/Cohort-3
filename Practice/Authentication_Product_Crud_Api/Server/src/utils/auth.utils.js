@@ -47,3 +47,7 @@ export const verifyRefreshToken = async (refrehToken) => {
     return decoded.userId
 
 }
+
+export const readAccessToken = (accessToken)=>{
+    return jwt.verify(accessToken,config.ACCESS_TOKEN_SECRET)
+}
