@@ -144,10 +144,77 @@ export const refreshToken = async (req, res) => {
       },
       accessToken,
     });
-
   } catch (error) {
     return res.status(401).josn({
-        message : "Invalid refresh token"
-    })
+      message: "Invalid refresh token",
+    });
   }
+};
+
+/**
+ * @description login an user and save the data from req.body
+ * @param req express.Request
+ * @param req.body Object
+ * @param req.body.email String
+ * @param req.body.password String
+ */
+
+export const getMe = async (req, res) => {
+  const { userId } = req.user;
+
+  const user = await userModel.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+
+  res.status(200).json({
+    message: "User fetched successfully",
+    data: {
+      userId: user._id,
+      name: user.name,
+      email: user.email,
+    },
+  });
+};
+
+/**
+ * @description login an user and save the data from req.body
+ * @param req express.Request
+ * @param req.body Object
+ * @param req.body.email String
+ * @param req.body.password String
+ */
+
+export const logout = async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  if (!refreshToken) {
+    return res.status(401).json({
+      message: "Invalid refresh token",
+    });
+  }
+
+  const tokenHash = createTokenHash(refreshToken);
+
+  const session = await refreshModel.findOne({ tokenHash });
+
+  if (!session) {
+    return res.status(401).json({
+      message: "Invalid refresh token",
+    });
+  }
+
+  if (session.revokedAt === null) {
+    session.revokedAt = new Date();
+    await session.save();
+  }
+
+  res.clearCookie("refreshToken");
+
+  return res.status(200).json({
+    message: "User logged out successfully",
+  });
 };
